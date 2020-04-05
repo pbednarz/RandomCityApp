@@ -1,2 +1,3 @@
 rootProject.name='RandomCityApp'
 include ':app'
+include ':database'
