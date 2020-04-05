@@ -18,5 +18,5 @@ data class CityEntity(
     val color: Int,
 
     @TypeConverters(TimestampConverter::class)
-    val emittedAt: Date
+    val createdAt: Date
 )

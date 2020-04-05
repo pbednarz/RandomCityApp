@@ -11,7 +11,7 @@ class ColorNameMapper : Mapper<String, Int> {
             "Red" -> Color.RED
             "Black" -> Color.BLACK
             "White" -> Color.WHITE
-            else -> Color.MAGENTA
+            else -> throw IllegalStateException("Couldn't parse color $from")
         }
     }
 }

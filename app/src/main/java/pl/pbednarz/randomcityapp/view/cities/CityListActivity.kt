@@ -29,8 +29,10 @@ class CityListActivity : AppCompatActivity() {
         listViewModel.cities.observe(this, Observer {
             adapter.setItems(it)
         })
-        listViewModel.citySelected.observe(this, Observer {
-            openCityDetails(it)
+        listViewModel.citySelected.observe(this, Observer { event ->
+            event?.getContentIfNotHandled()?.let {
+                openCityDetails(it)
+            }
         })
     }
 

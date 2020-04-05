@@ -3,41 +3,41 @@ package pl.pbednarz.randomcityapp.view.cities.details
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import pl.pbednarz.randomcityapp.di.SchedulersProvider
 import pl.pbednarz.randomcityapp.domain.City
 import pl.pbednarz.randomcityapp.domain.CityWithPosition
 import pl.pbednarz.randomcityapp.domain.repositories.CityLocationRepository
 import timber.log.Timber
 
 class CityDetailsViewModel(
-    private val cityLocationRepository: CityLocationRepository
+    private val cityLocationRepository: CityLocationRepository,
+    private val schedulersProvider: SchedulersProvider
 ) : ViewModel() {
 
     private val _selectedCity: MutableLiveData<City> = MutableLiveData()
-    private val _cityLocationState: MutableLiveData<State> = MutableLiveData()
+    private val _cityLocationViewState: MutableLiveData<ViewState> = MutableLiveData()
     private val compositeDisposable = CompositeDisposable()
 
     val selectedCity: LiveData<City> = _selectedCity
-    val cityLocationState: LiveData<State> = _cityLocationState
+    val cityLocationViewState: LiveData<ViewState> = _cityLocationViewState
 
     fun onCitySelected(city: City) {
         _selectedCity.value = city
 
         compositeDisposable.add(cityLocationRepository.getCityLocation(city)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(schedulersProvider.io())
+            .observeOn(schedulersProvider.ui())
             .doOnSubscribe {
-                _cityLocationState.value = State(progressVisible = true)
+                _cityLocationViewState.value = ViewState(progressVisible = true)
             }
             .subscribeBy(
                 onSuccess = {
-                    _cityLocationState.value = State(cityPos = CityWithPosition(city, it))
+                    _cityLocationViewState.value = ViewState(cityPos = CityWithPosition(city, it))
                 },
                 onError = {
-                    _cityLocationState.value = State(errorVisible = true)
+                    _cityLocationViewState.value = ViewState(errorVisible = true)
                     Timber.e(it, "Error while fetching city location: $city")
                 }
             )
@@ -49,7 +49,7 @@ class CityDetailsViewModel(
         super.onCleared()
     }
 
-    data class State(
+    data class ViewState(
         val progressVisible: Boolean = false,
         val errorVisible: Boolean = false,
         val cityPos: CityWithPosition? = null

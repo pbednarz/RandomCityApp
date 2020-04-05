@@ -17,6 +17,8 @@ import pl.pbednarz.randomcityapp.view.splash.SplashViewModel
 @JvmField
 val appModule = module {
 
+    single<SchedulersProvider> { AppSchedulersProvider() }
+
     single { Room.databaseBuilder(get(), CitiesDatabase::class.java, "cities_db").build() }
 
     single { get<CitiesDatabase>().citiesDao() }
@@ -27,7 +29,7 @@ val appModule = module {
 
     single { CityEntityMapper() }
 
-    single { CitiesProducerService(get(), get()) }
+    single { CitiesProducerService(get(), get(), get()) }
 
     single<CityLocationRepository> {
         CityLocationRepositoryImpl()
@@ -41,9 +43,9 @@ val appModule = module {
         CitiesRepositoryImpl(get(), get(), get())
     }
 
-    viewModel { SplashViewModel(get()) }
+    viewModel { SplashViewModel(get(), get()) }
 
     viewModel { CitiesListViewModel(get()) }
 
-    viewModel { CityDetailsViewModel(get()) }
+    viewModel { CityDetailsViewModel(get(), get()) }
 }

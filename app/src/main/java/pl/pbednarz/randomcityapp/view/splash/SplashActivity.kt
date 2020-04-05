@@ -15,9 +15,11 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        splashViewModel.newCityLiveData.observe(this, Observer { city ->
-            startActivity(CityListActivity.newInstance(this, city))
-            finish()
+        splashViewModel.newCityLiveData.observe(this, Observer { event ->
+            event?.getContentIfNotHandled()?.let {
+                startActivity(CityListActivity.newInstance(this, it))
+                finish()
+            }
         })
     }
 }

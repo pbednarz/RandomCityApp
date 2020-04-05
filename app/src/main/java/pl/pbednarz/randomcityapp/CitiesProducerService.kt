@@ -6,8 +6,8 @@ import androidx.lifecycle.OnLifecycleEvent
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
+import pl.pbednarz.randomcityapp.di.SchedulersProvider
 import pl.pbednarz.randomcityapp.domain.City
 import pl.pbednarz.randomcityapp.domain.repositories.CitiesRepository
 import pl.pbednarz.randomcityapp.domain.repositories.RandomCityRepository
@@ -17,7 +17,8 @@ import java.util.concurrent.TimeUnit
 
 class CitiesProducerService(
     private val citiesRepository: CitiesRepository,
-    private val randomCityRepository: RandomCityRepository
+    private val randomCityRepository: RandomCityRepository,
+    private val schedulersProvider: SchedulersProvider
 ) : LifecycleObserver {
 
     private val randomCityPublisher: PublishSubject<City> = PublishSubject.create()
@@ -33,8 +34,8 @@ class CitiesProducerService(
         timerDisposable?.dispose()
         timerDisposable =
             Observable.interval(TIMER_INTERVAL_SEC, TIMER_INTERVAL_SEC, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+                .subscribeOn(schedulersProvider.io())
+                .observeOn(schedulersProvider.io())
                 .flatMap { randomCityRepository.getRandomCity().toObservable() }
                 .flatMap { newCity ->
                     citiesRepository.saveCity(newCity)

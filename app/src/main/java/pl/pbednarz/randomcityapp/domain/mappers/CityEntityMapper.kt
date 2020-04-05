@@ -9,7 +9,7 @@ class CityEntityMapper : Mapper<CityEntity, City> {
             id = from.id,
             name = from.cityName,
             color = from.color,
-            createdAt = from.emittedAt
+            createdAt = from.createdAt
         )
     }
 }
