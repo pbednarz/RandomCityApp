@@ -31,14 +31,14 @@ class CityDetailsViewModel(
             .subscribeOn(schedulersProvider.io())
             .observeOn(schedulersProvider.ui())
             .doOnSubscribe {
-                _cityLocationViewState.value = ViewState(progressVisible = true)
+                _cityLocationViewState.value = ViewState.InProgress
             }
             .subscribeBy(
                 onSuccess = {
-                    _cityLocationViewState.value = ViewState(cityPos = it)
+                    _cityLocationViewState.value = ViewState.CityPos(it)
                 },
                 onError = {
-                    _cityLocationViewState.value = ViewState(errorVisible = true)
+                    _cityLocationViewState.value = ViewState.Error(it)
                     Timber.e(it, "Error while fetching city location: $city")
                 }
             )
@@ -50,11 +50,11 @@ class CityDetailsViewModel(
         super.onCleared()
     }
 
-    data class ViewState(
-        val progressVisible: Boolean = false,
-        val errorVisible: Boolean = false,
-        val cityPos: CityLocation? = null
-    )
+    sealed class ViewState {
+        object InProgress : ViewState()
+        data class Error(val error: Throwable) : ViewState()
+        data class CityPos(val cityPos: CityLocation) : ViewState()
+    }
 
 }
 

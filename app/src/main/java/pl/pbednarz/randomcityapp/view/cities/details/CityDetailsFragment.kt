@@ -69,10 +69,23 @@ class CityDetailsFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         detailsViewModel.cityLocationViewState.observe(this, Observer { state ->
-            errorView.visible = state.errorVisible
-            progressBar.visible = state.progressVisible
-            if (state.cityPos != null) {
-                showCityOnMap(state.cityPos)
+            when (state) {
+                CityDetailsViewModel.ViewState.InProgress -> {
+                    errorView.visible = false
+                    progressBar.visible = true
+                    mMap.clear()
+                }
+                is CityDetailsViewModel.ViewState.Error -> {
+                    errorView.visible = true
+                    progressBar.visible = false
+                    mMap.clear()
+                }
+                is CityDetailsViewModel.ViewState.CityPos -> {
+                    errorView.visible = false
+                    progressBar.visible = false
+                    mMap.clear()
+                    showCityOnMap(state.cityPos)
+                }
             }
         })
     }
