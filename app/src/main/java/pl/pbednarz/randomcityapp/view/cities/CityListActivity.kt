@@ -15,6 +15,7 @@ import pl.pbednarz.randomcityapp.view.cities.adapter.OnCityClickListener
 import pl.pbednarz.randomcityapp.view.cities.details.CityDetailsActivity
 import pl.pbednarz.randomcityapp.view.cities.details.CityDetailsFragment
 
+
 class CityListActivity : AppCompatActivity() {
 
     private val listViewModel: CitiesListViewModel by viewModel()
@@ -54,11 +55,19 @@ class CityListActivity : AppCompatActivity() {
     }
 
     private fun openDetailsFragmentBySide(selectedCityColor: City) {
-        val fragment = CityDetailsFragment.newInstance(selectedCityColor)
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.item_detail_container, fragment)
-            .commit()
+        val currentFragment: CityDetailsFragment? =
+            supportFragmentManager.findFragmentById(R.id.item_detail_container)
+                    as? CityDetailsFragment
+        if (currentFragment != null) {
+            // TODO: this is ugly hack, it should be handled by shared viewModel instead
+            currentFragment.updateCity(selectedCityColor)
+        } else {
+            val fragment = CityDetailsFragment.newInstance(selectedCityColor)
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.item_detail_container, fragment)
+                .commit()
+        }
     }
 
     private fun openDetailsActivity(selectedCityColor: City) {

@@ -37,6 +37,12 @@ class CityDetailsFragment : Fragment(), OnMapReadyCallback {
         detailsViewModel.onCitySelected(selectedCity)
     }
 
+    fun updateCity(selectedCity: City) {
+        // TODO: ugly hack, use shared viewModel instead
+        arguments?.putParcelable(ARG_SELECTED_CITY, selectedCity)
+        detailsViewModel.onCitySelected(selectedCity)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
