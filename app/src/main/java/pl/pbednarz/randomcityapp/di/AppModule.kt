@@ -10,6 +10,8 @@ import pl.pbednarz.randomcityapp.domain.mappers.CityDomainMapper
 import pl.pbednarz.randomcityapp.domain.mappers.CityEntityMapper
 import pl.pbednarz.randomcityapp.domain.mappers.ColorNameMapper
 import pl.pbednarz.randomcityapp.domain.repositories.*
+import pl.pbednarz.randomcityapp.domain.usecases.FetchCityLocationUseCase
+import pl.pbednarz.randomcityapp.domain.usecases.GenerateRandomCityUseCase
 import pl.pbednarz.randomcityapp.view.cities.CitiesListViewModel
 import pl.pbednarz.randomcityapp.view.cities.details.CityDetailsViewModel
 import pl.pbednarz.randomcityapp.view.splash.SplashViewModel
@@ -29,7 +31,7 @@ val appModule = module {
 
     single { CityEntityMapper() }
 
-    single { CitiesProducerService(get(), get(), get()) }
+    single { CitiesProducerService(get(), get()) }
 
     single<CityLocationRepository> {
         CityLocationRepositoryImpl()
@@ -42,6 +44,10 @@ val appModule = module {
     single<CitiesRepository> {
         CitiesRepositoryImpl(get(), get(), get())
     }
+
+    factory { GenerateRandomCityUseCase(get(), get()) }
+
+    factory { FetchCityLocationUseCase(get()) }
 
     viewModel { SplashViewModel(get(), get()) }
 

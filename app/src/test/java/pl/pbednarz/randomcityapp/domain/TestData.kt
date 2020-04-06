@@ -21,4 +21,9 @@ object TestData {
         color = Color.RED,
         createdAt = Date(timeStamp)
     )
+
+    val location = LatLng(
+        lat = 30.12121,
+        lng = 77.11120
+    )
 }

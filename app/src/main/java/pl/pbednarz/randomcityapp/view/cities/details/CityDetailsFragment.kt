@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.fragment_city_details.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import pl.pbednarz.randomcityapp.R
 import pl.pbednarz.randomcityapp.domain.City
-import pl.pbednarz.randomcityapp.domain.CityWithPosition
+import pl.pbednarz.randomcityapp.domain.CityLocation
 import pl.pbednarz.randomcityapp.extensions.visible
 import pl.pbednarz.randomcityapp.extensions.withArguments
 import timber.log.Timber
@@ -71,15 +71,15 @@ class CityDetailsFragment : Fragment(), OnMapReadyCallback {
         })
     }
 
-    private fun showCityOnMap(cityWithPos: CityWithPosition) {
+    private fun showCityOnMap(cityPos: CityLocation) {
         val mapPos = LatLng(
-            cityWithPos.latLng.lat,
-            cityWithPos.latLng.lng
+            cityPos.latLng.lat,
+            cityPos.latLng.lng
         )
         mMap.addMarker(
             MarkerOptions()
                 .position(mapPos)
-                .title(cityWithPos.city.name)
+                .title(cityPos.city.name)
         )
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapPos, MAP_ZOOM))
     }

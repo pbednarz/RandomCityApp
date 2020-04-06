@@ -9,15 +9,13 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import pl.pbednarz.randomcityapp.di.SchedulersProvider
 import pl.pbednarz.randomcityapp.domain.City
-import pl.pbednarz.randomcityapp.domain.repositories.CitiesRepository
-import pl.pbednarz.randomcityapp.domain.repositories.RandomCityRepository
+import pl.pbednarz.randomcityapp.domain.usecases.GenerateRandomCityUseCase
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
 class CitiesProducerService(
-    private val citiesRepository: CitiesRepository,
-    private val randomCityRepository: RandomCityRepository,
+    private val generateRandomCityUseCase: GenerateRandomCityUseCase,
     private val schedulersProvider: SchedulersProvider
 ) : LifecycleObserver {
 
@@ -36,11 +34,7 @@ class CitiesProducerService(
             Observable.interval(TIMER_INTERVAL_SEC, TIMER_INTERVAL_SEC, TimeUnit.SECONDS)
                 .subscribeOn(schedulersProvider.io())
                 .observeOn(schedulersProvider.io())
-                .flatMap { randomCityRepository.getRandomCity().toObservable() }
-                .flatMap { newCity ->
-                    citiesRepository.saveCity(newCity)
-                        .andThen(Observable.just(newCity))
-                }
+                .flatMap { generateRandomCityUseCase.execute().toObservable() }
                 .subscribeBy(
                     onNext = { nextValue ->
                         Timber.d("New city generated: $nextValue")
@@ -61,4 +55,3 @@ class CitiesProducerService(
         private const val TIMER_INTERVAL_SEC = 5L
     }
 }
-

@@ -7,13 +7,13 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import pl.pbednarz.randomcityapp.di.SchedulersProvider
 import pl.pbednarz.randomcityapp.domain.City
-import pl.pbednarz.randomcityapp.domain.CityWithPosition
-import pl.pbednarz.randomcityapp.domain.repositories.CityLocationRepository
+import pl.pbednarz.randomcityapp.domain.CityLocation
+import pl.pbednarz.randomcityapp.domain.usecases.FetchCityLocationUseCase
 import timber.log.Timber
 
 class CityDetailsViewModel(
-    private val cityLocationRepository: CityLocationRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val schedulersProvider: SchedulersProvider,
+    private val fetchCityLocationUseCase: FetchCityLocationUseCase
 ) : ViewModel() {
 
     private val _selectedCity: MutableLiveData<City> = MutableLiveData()
@@ -26,7 +26,8 @@ class CityDetailsViewModel(
     fun onCitySelected(city: City) {
         _selectedCity.value = city
 
-        compositeDisposable.add(cityLocationRepository.getCityLocation(city)
+        compositeDisposable.add(
+            fetchCityLocationUseCase.execute(city)
             .subscribeOn(schedulersProvider.io())
             .observeOn(schedulersProvider.ui())
             .doOnSubscribe {
@@ -34,7 +35,7 @@ class CityDetailsViewModel(
             }
             .subscribeBy(
                 onSuccess = {
-                    _cityLocationViewState.value = ViewState(cityPos = CityWithPosition(city, it))
+                    _cityLocationViewState.value = ViewState(cityPos = it)
                 },
                 onError = {
                     _cityLocationViewState.value = ViewState(errorVisible = true)
@@ -52,7 +53,7 @@ class CityDetailsViewModel(
     data class ViewState(
         val progressVisible: Boolean = false,
         val errorVisible: Boolean = false,
-        val cityPos: CityWithPosition? = null
+        val cityPos: CityLocation? = null
     )
 
 }
